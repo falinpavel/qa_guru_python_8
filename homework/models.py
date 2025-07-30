@@ -32,6 +32,7 @@ class Product:
             Проверьте количество продукта используя метод check_quantity
             Если продуктов не хватает, то выбросите исключение ValueError
         """
+
         raise NotImplementedError
 
     def __hash__(self):
@@ -49,17 +50,13 @@ class Cart:
 
     def __init__(self):
         # По-умолчанию корзина пустая
-        self.products: dict = {}
+        self.products = {}
 
     def add_product(self, product: Product, buy_count=1):
         """
         Метод добавления продукта в корзину.
         Если продукт уже есть в корзине, то увеличиваем количество
         """
-        if product in self.products:
-            self.products[product] += buy_count
-        else:
-            self.products[product] = buy_count
         raise NotImplementedError
 
     def remove_product(self, product: Product, remove_count=None):
