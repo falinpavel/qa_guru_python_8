@@ -19,10 +19,24 @@ class TestProducts:
 
     def test_product_check_quantity(self, product):
         # TODO напишите проверки на метод check_quantity
-        product_apple = Product(name="apple", price=3.35, description="This is green apple", quantity=30)
+        product_apple = Product(
+            name="apple",
+            price=3.35,
+            description="This is green apple",
+            quantity=30
+        )
+        assert product_apple.quantity == 30
         assert product_apple.check_quantity(29) is True
         assert product_apple.check_quantity(30) is True
         assert product_apple.check_quantity(31) is False
+        product_banana = Product(
+            name="banana",
+            price=2.75,
+            description="This is green banana",
+            quantity=20
+        )
+        product_apple.quantity = 20
+        assert product_banana.quantity == product_apple.quantity
 
     def test_product_buy(self, product):
         # TODO напишите проверки на метод buy

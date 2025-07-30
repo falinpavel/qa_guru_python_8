@@ -13,6 +13,12 @@ class Product:
         self.description = description
         self.quantity = quantity
 
+    def __eq__(self, other):
+        return (self.name == other.name and
+                self.price == other.price and
+                self.description == other.description and
+                self.quantity == other.quantity)
+
     def check_quantity(self, quantity) -> bool:
         """
         TODO Верните True если количество продукта больше или равно запрашиваемому
