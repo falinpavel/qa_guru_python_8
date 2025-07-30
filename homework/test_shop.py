@@ -19,6 +19,11 @@ class TestProducts:
 
     def test_product_check_quantity(self, product):
         # TODO напишите проверки на метод check_quantity
+        product_apple = Product(name="apple", price=3.35, description="This is green apple", quantity=30)
+        print(product_apple.check_quantity(33))
+        product_banana = Product(name="banana", price=1.99, description="This is yellow banana", quantity=10)
+        product_orange = Product(name="orange", price=2.85, description="This is orange", quantity=15)
+        product_pineapple = Product(name="pineapple", price=9.99, description="This is red pineapple", quantity=5)
         pass
 
     def test_product_buy(self, product):
