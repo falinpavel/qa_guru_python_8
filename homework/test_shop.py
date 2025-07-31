@@ -69,11 +69,12 @@ class TestProducts:
     def test_product_buy_more_than_available(self, product):
         # TODO напишите проверки на метод buy,
         #  которые ожидают ошибку ValueError при попытке купить больше, чем есть в наличии
-        assert product.quantity == 1000
+        assert product.quantity == 1000 # количество продуктов изначально
         with pytest.raises(ValueError, match='Not enough products'):
             product.buy(product.quantity + 1)
             product.buy(-1)
-        assert product.quantity == 1000  # количество продуктов не должно измениться
+            product.buy(0)
+        assert product.quantity == 1000  # количество продуктов осталось неизменным
 
 
 class TestCart:
@@ -105,6 +106,8 @@ class TestCart:
 
     def test_remove_products_from_not_empty_cart(self, not_empty_cart, product):
         assert len(not_empty_cart.products) == 6
+        with pytest.raises(KeyError):
+            not_empty_cart.remove_product(Product("test", 113, "test test test", 1000)) # товара нет в корзине
 
     def test_cart_clear(self, not_empty_cart):
         assert not_empty_cart.products != {}
@@ -120,9 +123,9 @@ class TestCart:
         not_empty_cart.clear()
         assert not_empty_cart.get_total_price() == 0
 
-    def test_buy(self, empty_cart, product):
-        assert empty_cart.products == {}
-        empty_cart.add_product(product)
-        assert product in empty_cart.products
-        assert empty_cart.products == {product: 1}
-        empty_cart.buy(product, 1)
+    def test_buy(self, not_empty_cart):
+        assert not_empty_cart.get_total_price() == 6880
+        all_products = not_empty_cart.products
+        for product in all_products:
+            not_empty_cart.buy(product, all_products[product])
+        assert not_empty_cart.get_total_price() == 0
