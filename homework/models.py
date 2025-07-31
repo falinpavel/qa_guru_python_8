@@ -10,6 +10,13 @@ class Product:
     price: float
     description: str
     quantity: int
+    # Пример обьекта:
+    # {
+    #     "name": "Milk",
+    #     "price": 100.0,
+    #     "description": "Milk from cow",
+    #     "quantity": 1000
+    # }
 
     # def __init__(self, name, price, description, quantity):
     #     self.name = name
@@ -39,7 +46,8 @@ class Product:
         """
         if self.check_quantity(quantity) is False:
             raise ValueError('Not enough products')
-        self.quantity -= quantity
+        else:
+            self.quantity -= quantity
 
     def __hash__(self) -> int:
         return hash(self.name + self.description)
@@ -50,9 +58,13 @@ class Cart:
     Класс корзины. В нем хранятся продукты, которые пользователь хочет купить.
     TODO реализуйте все методы класса
     """
-
     # Словарь продуктов и их количество в корзине
     products: dict[Product, int]
+    # Пример корзины для понимания
+    # {
+    #     Product("book1", 113, "This is a book1", 1000): 1,
+    #     Product("book2", 141, "This is a book2", 800): 2
+    # }
 
     def __init__(self):
         # По-умолчанию корзина пустая
@@ -86,7 +98,7 @@ class Cart:
         self.products = {}
 
     def get_total_price(self) -> float:
-        raise NotImplementedError
+        return sum([product.price * self.products[product] for product in self.products.keys()])
 
     def buy(self):
         """
