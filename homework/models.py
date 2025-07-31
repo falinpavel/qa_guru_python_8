@@ -1,3 +1,7 @@
+from dataclasses import dataclass
+
+
+@dataclass
 class Product:
     """
     Класс продукта
@@ -7,17 +11,17 @@ class Product:
     description: str
     quantity: int
 
-    def __init__(self, name, price, description, quantity):
-        self.name = name
-        self.price = price
-        self.description = description
-        self.quantity = quantity
-
-    def __eq__(self, other):
-        return (self.name == other.name and
-                self.price == other.price and
-                self.description == other.description and
-                self.quantity == other.quantity)
+    # def __init__(self, name, price, description, quantity):
+    #     self.name = name
+    #     self.price = price
+    #     self.description = description
+    #     self.quantity = quantity
+    #
+    # def __eq__(self, other):
+    #     return (self.name == other.name and
+    #             self.price == other.price and
+    #             self.description == other.description and
+    #             self.quantity == other.quantity)
 
     def check_quantity(self, quantity) -> bool:
         """
@@ -52,7 +56,6 @@ class Cart:
 
     def __init__(self):
         # По-умолчанию корзина пустая
-        # { }
         self.products = {}
 
     def add_product(self, product: Product, buy_count=1):
@@ -71,10 +74,16 @@ class Cart:
         Если remove_count не передан, то удаляется вся позиция
         Если remove_count больше, чем количество продуктов в позиции, то удаляется вся позиция
         """
-        raise NotImplementedError
+        if remove_count is None:
+            self.products.pop(product)
+        else:
+            if remove_count > self.products[product]:
+                self.products.pop(product)
+            else:
+                self.products[product] -= remove_count
 
     def clear(self):
-        raise NotImplementedError
+        self.products = {}
 
     def get_total_price(self) -> float:
         raise NotImplementedError
