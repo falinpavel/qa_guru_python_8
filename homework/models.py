@@ -100,10 +100,13 @@ class Cart:
     def get_total_price(self) -> float:
         return sum([product.price * self.products[product] for product in self.products.keys()])
 
-    def buy(self):
+    def buy(self, product: Product, buy_count:int=1):
         """
         Метод покупки.
         Учтите, что товаров может не хватать на складе.
         В этом случае нужно выбросить исключение ValueError
         """
-        raise NotImplementedError
+        if product.check_quantity(buy_count) is False:
+            raise ValueError('Not enough products')
+        else:
+            product.buy(buy_count)

@@ -58,15 +58,11 @@ class TestProducts:
         # TODO напишите проверки на метод buy
         assert product.quantity == 1000
         assert product.check_quantity(1000) is True
-
         product.buy(1)
-
         assert product.quantity == 999
         assert product.check_quantity(1000) is False
         assert product.check_quantity(999) is True
-
         product.buy(999)
-
         assert product.quantity == 0
         assert product.check_quantity(1) is False
 
@@ -74,11 +70,9 @@ class TestProducts:
         # TODO напишите проверки на метод buy,
         #  которые ожидают ошибку ValueError при попытке купить больше, чем есть в наличии
         assert product.quantity == 1000
-
         with pytest.raises(ValueError, match='Not enough products'):
             product.buy(product.quantity + 1)
             product.buy(-1)
-
         assert product.quantity == 1000  # количество продуктов не должно измениться
 
 
@@ -94,26 +88,18 @@ class TestCart:
 
     def test_cart_add_product(self, empty_cart, product):
         assert empty_cart.products == {}
-
         empty_cart.add_product(product)
-
         assert product in empty_cart.products
         assert empty_cart.products == {product: 1}
 
     def test_cart_add_and_remove_product(self, empty_cart, product):
         assert empty_cart.products == {}
-
         empty_cart.add_product(product, 5)
-
         assert product in empty_cart.products
         assert empty_cart.products == {product: 5}
-
         empty_cart.remove_product(product, 1)
-
         assert empty_cart.products == {product: 4}
-
         empty_cart.remove_product(product)
-
         assert product not in empty_cart.products
         assert empty_cart.products == {}
 
@@ -122,8 +108,21 @@ class TestCart:
 
     def test_cart_clear(self, not_empty_cart):
         assert not_empty_cart.products != {}
-
         not_empty_cart.clear()
-
         assert not_empty_cart.products == {}
 
+    def test_get_total_price(self, not_empty_cart, product):
+        assert not_empty_cart.get_total_price() == 6880
+        not_empty_cart.add_product(product)
+        assert not_empty_cart.get_total_price() == 6980
+        not_empty_cart.remove_product(product)
+        assert not_empty_cart.get_total_price() == 6880
+        not_empty_cart.clear()
+        assert not_empty_cart.get_total_price() == 0
+
+    def test_buy(self, empty_cart, product):
+        assert empty_cart.products == {}
+        empty_cart.add_product(product)
+        assert product in empty_cart.products
+        assert empty_cart.products == {product: 1}
+        empty_cart.buy(product, 1)
