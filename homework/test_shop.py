@@ -69,7 +69,9 @@ class TestProducts:
         assert product.quantity == 1000
         with pytest.raises(ValueError, match='Not enough products'):
             product.buy(product.quantity + 1)
+        with pytest.raises(ValueError, match='Not enough products'):
             product.buy(-1)
+        with pytest.raises(ValueError, match='Not enough products'):
             product.buy(0)
         assert product.quantity == 1000
 
@@ -160,7 +162,9 @@ class TestCart:
         empty_cart.add_product(product, buy_count=1000)
         with pytest.raises(ValueError):
             empty_cart.buy_one(product=product, quantity=product.quantity, money=99)
+        with pytest.raises(ValueError):
             empty_cart.buy_one(product=product, quantity=1001, money=150)
+        with pytest.raises(ValueError):
             empty_cart.buy_one(product=product, quantity=-1, money=150)
 
     def test_buy_more_then_one_product_in_cart(self, not_empty_cart):
@@ -174,7 +178,9 @@ class TestCart:
         assert not_empty_cart.get_total_price() == 6880
         with pytest.raises(ValueError):
             not_empty_cart.buy_all_cart(6879)
+        with pytest.raises(ValueError):
             not_empty_cart.buy_all_cart(0)
+        with pytest.raises(ValueError):
             not_empty_cart.buy_all_cart(-1)
         not_empty_cart.buy_all_cart(money=6880)
         assert not_empty_cart.products == {}
