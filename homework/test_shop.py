@@ -197,19 +197,28 @@ class TestCart:
         empty_cart.clear()
         assert not empty_cart.products
 
-    def test_cart_get_total_price(self, not_empty_cart: Cart, book_product: Product):
+    def test_cart_get_total_price_many_products(self, not_empty_cart: Cart, book_product: Product):
         """
-        Тест кейс на получение общей стоимости корзины,
-        изменение стоимости корзины и проверка
-        очищения корзины и ее общей стоимости == 0
+        Тест кейс на получение общей стоимости корзины
+        в которой много продуктов
+        изменение стоимости корзины в процессе и проверка
+        очищения корзины и определения ее общей стоимости == 0
         """
-        assert not_empty_cart.get_total_price() == 6750
+        assert not_empty_cart.get_total_price() == 6750.0
         not_empty_cart.add_product(product=book_product)
-        assert not_empty_cart.get_total_price() == 6850
+        assert not_empty_cart.get_total_price() == 6850.0
         not_empty_cart.remove_product(product=book_product)
-        assert not_empty_cart.get_total_price() == 6750
+        assert not_empty_cart.get_total_price() == 6750.0
         not_empty_cart.clear()
         assert not_empty_cart.get_total_price() == 0
+
+    def test_cart_get_total_price_one_product(self, empty_cart: Cart, book_product: Product):
+        """
+        Тест кейс на получение общей стоимости корзины
+        в которой есть один продукт
+        """
+        empty_cart.add_product(product=book_product)
+        assert empty_cart.get_total_price() == book_product.price
 
     def test_cart_buy_one_product(self, empty_cart: Cart, book_product: Product):
         """
@@ -241,7 +250,7 @@ class TestCart:
         и проверка очистки корзины при успешной покупке
         """
         assert len(not_empty_cart.products) == 6
-        assert not_empty_cart.get_total_price() == 6750
+        assert not_empty_cart.get_total_price() == 6750.0
         with pytest.raises(ValueError):
             not_empty_cart.buy_all_cart(money=6749)
         with pytest.raises(ValueError):

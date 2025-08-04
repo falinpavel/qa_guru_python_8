@@ -99,7 +99,8 @@ class Cart:
         self.products.clear()
 
     def get_total_price(self) -> float:
-        return sum([product.price * self.products[product] for product in self.products.keys()])
+        return float(sum([product.price * self.products[product]
+                          for product in self.products.keys()]))
 
     def buy_one(self, product: Product, quantity: int, money: int = 0) -> None:
         """
