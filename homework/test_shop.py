@@ -181,7 +181,7 @@ class TestCart:
         empty_cart.remove_product(product=book_product, remove_count=book_product.quantity + 1)
         assert len(empty_cart.products) == 0
 
-    def test_no_empty_cart_clear(self, not_empty_cart):
+    def test_no_empty_cart_clear(self, not_empty_cart: Cart):
         """
         Тест кейс на очистку корзины и проверка что она действительно стала пустой
         """
@@ -189,7 +189,7 @@ class TestCart:
         not_empty_cart.clear()
         assert not not_empty_cart.products
 
-    def test_empty_cart_clear(self, empty_cart):
+    def test_empty_cart_clear(self, empty_cart: Cart):
         """
         Тест кейс на очистку корзины и проверка что она действительно стала пустой
         """
@@ -227,44 +227,62 @@ class TestCart:
         empty_cart.clear()
         assert empty_cart.get_total_price() == 0
 
-    def test_cart_buy_one_product(self, empty_cart: Cart, book_product: Product):
+    def test_cart_buy_one_product_with_enough_quantity(self, empty_cart: Cart, book_product: Product):
         """
         Тест кейс на покупку одного продукта в корзине
-        с достаточным количеством денег и достаточным колличеством товаров
-        и проверка исключений ValueError
+        с достаточным количеством денег и достаточным колличеством товаро,
+        затем проверка что товар удалился из корзины и она стала пустой
         """
         empty_cart.add_product(book_product, buy_count=1000)
         assert book_product in empty_cart.products
-        assert empty_cart.products[book_product] == 1000
-        empty_cart.buy_one(product=book_product, quantity=1000, money=100)
-        assert book_product not in empty_cart.products
+        empty_cart.buy(money=100000)
+        assert not book_product in empty_cart.products
         assert empty_cart.products == {}
-        # empty_cart.add_product(product, buy_count=1000)
-        # with pytest.raises(ValueError, match='Not enough money'):
-        #     empty_cart.buy_one(product=product, quantity=product.quantity, money=99)
-        # with pytest.raises(ValueError, match='Not enough products'):
-        #     empty_cart.buy_one(product=product, quantity=1001, money=150)
-        # with pytest.raises(ValueError, match='Not enough products'):
-        #     empty_cart.buy_one(product=product, quantity=-1, money=150)
-        # assert empty_cart.products == {product: 1000}
-        # empty_cart.buy_one(product=product, quantity=None, money=100)
 
-    def test_cart_buy_more_then_one_product(self, not_empty_cart: Cart):
+    def test_cart_buy_one_product_without_enough_quantity(self, empty_cart: Cart, book_product: Product):
         """
-        Тест кейс на покупку всех продуктов в корзине,
-        проверки при попытке купить с недостаточным количеством денег
-        (проверка исключений ValueError)
-        и проверка очистки корзины при успешной покупке
+        Тест кейс на покупку одного продукта в корзине
+        с достаточным количеством денег и НЕдостаточным колличеством товаро,
+        затем проверка что товар удалился из корзины и она стала пустой
         """
+        empty_cart.add_product(book_product, buy_count=1001)
+        assert book_product in empty_cart.products
+        with pytest.raises(ValueError, match='Not enough products'):
+            empty_cart.buy(money=int(book_product.price))
+        assert book_product in empty_cart.products
+        assert empty_cart.products != {}
+
+    def test_cart_buy_one_product_not_enough_money(self, empty_cart: Cart, book_product: Product):
+        """
+        Тест кейс на покупку одного продукта в корзине
+        с недостаточным количеством денег и достаточным колличеством товаров
+        """
+        empty_cart.add_product(book_product, buy_count=1000)
+        assert book_product in empty_cart.products
+        with pytest.raises(ValueError, match='Not enough money'):
+            empty_cart.buy(money=99999)
+
+    def test_cart_buy_all_many_products_with_enough_money(self, not_empty_cart: Cart):
+        """
+        Тест кейс на покупку большого количества продуктов в корзине
+        с достаточным количеством денег и достаточным колличеством товаров
+        на складе! Покупается вся корзина и в итоге корзина становится пустой
+        """
+        total_price = int(not_empty_cart.get_total_price())
         assert len(not_empty_cart.products) == 6
-        assert not_empty_cart.get_total_price() == 6750.0
-        with pytest.raises(ValueError):
-            not_empty_cart.buy_all_cart(money=6749)
-        with pytest.raises(ValueError):
-            not_empty_cart.buy_all_cart(money=0)
-        with pytest.raises(ValueError):
-            not_empty_cart.buy_all_cart(money=-1)
-        not_empty_cart.buy_all_cart(money=6750)
-        assert not_empty_cart.products == {}
-        assert not_empty_cart.get_total_price() == 0
+        not_empty_cart.buy(money=total_price)
         assert len(not_empty_cart.products) == 0
+        assert not not_empty_cart.products
+
+    def test_cart_buy_all_many_products_without_enough_money(self, not_empty_cart: Cart):
+        """
+        Тест кейс на покупку большого количества продуктов в корзине
+        с НЕДОСТАТОЧНЫМ количеством денег и достаточным колличеством товаров
+        на складе! Покупается вся корзина и в итоге корзина становится пустой
+        """
+        total_price = int(not_empty_cart.get_total_price())
+        assert len(not_empty_cart.products) == 6
+        with pytest.raises(ValueError, match='Not enough money'):
+            not_empty_cart.buy(money=total_price - 1)
+        assert not len(not_empty_cart.products) == 0
+
