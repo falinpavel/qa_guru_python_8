@@ -102,38 +102,52 @@ class Cart:
         return float(sum([product.price * self.products[product]
                           for product in self.products.keys()]))
 
-    def buy_one(self, product: Product, quantity: int, money: int = 0) -> None:
+    def buy(self, money: int = 0) -> None:
         """
         Метод покупки одного товара.
         Учтите, что товаров может не хватать на складе.
         Учтите, что у пользователя может не хватать денег.
         В этом случае нужно выбросить исключение ValueError
         """
-        if money >= product.price:
-            if product.check_quantity(quantity) is True:
-                if quantity == product.quantity:
-                    self.remove_product(product=product)
-                    product.buy(quantity=quantity)
-                elif quantity < product.quantity:
-                    self.remove_product(product=product, remove_count=quantity)
-                    product.buy(quantity=quantity)
-                else:
-                    self.remove_product(product=product, remove_count=quantity)
-                    self.products[product] -= quantity
-            else:
-                raise ValueError('Not enough products')
-        else:
-            raise ValueError('Not enough money')
-
-    def buy_all_cart(self, money: int) -> None:
-        """
-        Метод покупки.
-        Учтите, что товаров может не хватать на складе.
-        В этом случае нужно выбросить исключение ValueError
-        """
         if money >= self.get_total_price():
             for product in self.products.keys():
-                product.buy(self.products[product])
+                product.buy(quantity=self.products[product])
             self.clear()
         else:
             raise ValueError('Not enough money')
+
+    # def buy_one(self, product: Product, quantity: int, money: int = 0) -> None:
+    #     """
+    #     Метод покупки одного товара.
+    #     Учтите, что товаров может не хватать на складе.
+    #     Учтите, что у пользователя может не хватать денег.
+    #     В этом случае нужно выбросить исключение ValueError
+    #     """
+    #     if money >= product.price:
+    #         if product.check_quantity(quantity) is True:
+    #             if quantity == product.quantity:
+    #                 self.remove_product(product=product)
+    #                 product.buy(quantity=quantity)
+    #             elif quantity < product.quantity:
+    #                 self.remove_product(product=product, remove_count=quantity)
+    #                 product.buy(quantity=quantity)
+    #             else:
+    #                 self.remove_product(product=product, remove_count=quantity)
+    #                 self.products[product] -= quantity
+    #         else:
+    #             raise ValueError('Not enough products')
+    #     else:
+    #         raise ValueError('Not enough money')
+    #
+    # def buy_all_cart(self, money: int) -> None:
+    #     """
+    #     Метод покупки.
+    #     Учтите, что товаров может не хватать на складе.
+    #     В этом случае нужно выбросить исключение ValueError
+    #     """
+    #     if money >= self.get_total_price():
+    #         for product in self.products.keys():
+    #             product.buy(self.products[product])
+    #         self.clear()
+    #     else:
+    #         raise ValueError('Not enough money')

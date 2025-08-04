@@ -220,6 +220,13 @@ class TestCart:
         empty_cart.add_product(product=book_product)
         assert empty_cart.get_total_price() == book_product.price
 
+    def test_cart_get_total_price_empty(self, empty_cart: Cart):
+        """
+        Тест кейс на получение общей стоимости пустой корзины
+        """
+        empty_cart.clear()
+        assert empty_cart.get_total_price() == 0
+
     def test_cart_buy_one_product(self, empty_cart: Cart, book_product: Product):
         """
         Тест кейс на покупку одного продукта в корзине
