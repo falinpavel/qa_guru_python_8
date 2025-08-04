@@ -181,13 +181,21 @@ class TestCart:
         empty_cart.remove_product(product=book_product, remove_count=book_product.quantity + 1)
         assert len(empty_cart.products) == 0
 
-    def test_cart_clear(self, not_empty_cart):
+    def test_no_empty_cart_clear(self, not_empty_cart):
         """
         Тест кейс на очистку корзины и проверка что она действительно стала пустой
         """
-        assert not_empty_cart.products != {}
+        assert not_empty_cart.products
         not_empty_cart.clear()
-        assert not_empty_cart.products == {}
+        assert not not_empty_cart.products
+
+    def test_empty_cart_clear(self, empty_cart):
+        """
+        Тест кейс на очистку корзины и проверка что она действительно стала пустой
+        """
+        assert not empty_cart.products
+        empty_cart.clear()
+        assert not empty_cart.products
 
     def test_cart_get_total_price(self, not_empty_cart: Cart, book_product: Product):
         """
