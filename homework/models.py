@@ -67,10 +67,19 @@ class Cart:
         Метод добавления продукта в корзину.
         Если продукт уже есть в корзине, то увеличиваем количество
         """
-        if product in self.products.keys():
-            self.products[product] += buy_count
+        if buy_count > 0:
+            if product.check_quantity(buy_count) is True:
+                if product in self.products.keys():
+                    self.products[product] += buy_count
+                    # TODO! product.quantity -= buy_count. Проработать еще и
+                    #  удаление/резервирование продуктов
+                else:
+                    self.products[product] = buy_count
+                    # TODO! product.quantity -= buy_count
+            else:
+                raise ValueError('Not enough products')
         else:
-            self.products[product] = buy_count
+            raise ValueError('You can not buy zero or negative products')
 
     def remove_product(self, product: Product, remove_count: int = None) -> None:
         """
@@ -78,13 +87,16 @@ class Cart:
         Если remove_count не передан, то удаляется вся позиция
         Если remove_count больше, чем количество продуктов в позиции, то удаляется вся позиция
         """
-        if remove_count is None:
-            self.products.pop(product)
-        else:
-            if remove_count > self.products[product]:
+        if product not in self.products.keys():
+            raise KeyError('Product not in cart')
+        if product in self.products.keys():
+            if remove_count is None or remove_count > self.products[product]:
                 self.products.pop(product)
             else:
-                self.products[product] -= remove_count
+                if remove_count > self.products[product]:
+                    self.products.pop(product)
+                else:
+                    self.products[product] -= remove_count
 
     def clear(self) -> None:
         self.products.clear()
@@ -92,20 +104,26 @@ class Cart:
     def get_total_price(self) -> float:
         return sum([product.price * self.products[product] for product in self.products.keys()])
 
-    def buy_one(self, product: Product, quantity: int, money: int) -> None:
+    def buy_one(self, product: Product, quantity: int, money: int = 0) -> None:
         """
-        Метод покупки.
+        Метод покупки одного товара.
         Учтите, что товаров может не хватать на складе.
+        Учтите, что у пользователя может не хватать денег.
         В этом случае нужно выбросить исключение ValueError
         """
         if money >= product.price:
-            if product.check_quantity(quantity) is False:
-                raise ValueError('Not enough products')
-            elif quantity == product.quantity:
-                self.remove_product(product=product)
+            if product.check_quantity(quantity) is True:
+                if quantity == product.quantity:
+                    self.remove_product(product=product)
+                    product.buy(quantity=quantity)
+                elif quantity < product.quantity:
+                    self.remove_product(product=product, remove_count=quantity)
+                    product.buy(quantity=quantity)
+                else:
+                    self.remove_product(product=product, remove_count=quantity)
+                    self.products[product] -= quantity
             else:
-                self.remove_product(product=product, remove_count=quantity)
-                self.products[product] -= quantity
+                raise ValueError('Not enough products')
         else:
             raise ValueError('Not enough money')
 
@@ -116,6 +134,8 @@ class Cart:
         В этом случае нужно выбросить исключение ValueError
         """
         if money >= self.get_total_price():
+            for product in self.products.keys():
+                product.buy(self.products[product])
             self.clear()
         else:
             raise ValueError('Not enough money')
