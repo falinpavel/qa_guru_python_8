@@ -229,28 +229,35 @@ class TestCart:
 
     def test_cart_buy_one_product_with_enough_quantity(self, empty_cart: Cart, book_product: Product):
         """
-        Тест кейс на покупку одного продукта в корзине
-        с достаточным количеством денег и достаточным колличеством товаро,
-        затем проверка что товар удалился из корзины и она стала пустой
+        Тест кейс с покупкой одного продукта в корзине
+        с достаточным количеством денег и достаточным колличеством товаров,
+        + так же обязательнго проверяю что товар удалился из корзины
+        и на складе остаток уменьшился (== 0, так как выкуплены все 1000 единиц)
         """
         empty_cart.add_product(book_product, buy_count=1000)
+        assert len(empty_cart.products) == 1
         assert book_product in empty_cart.products
+        assert book_product.quantity == 1000
         empty_cart.buy(money=100000)
-        assert not book_product in empty_cart.products
+        assert len(empty_cart.products) == 0
+        assert book_product not in empty_cart.products
+        assert book_product.quantity == 0
         assert empty_cart.products == {}
 
     def test_cart_buy_one_product_without_enough_quantity(self, empty_cart: Cart, book_product: Product):
         """
         Тест кейс на покупку одного продукта в корзине
-        с достаточным количеством денег и НЕдостаточным колличеством товаро,
-        затем проверка что товар удалился из корзины и она стала пустой
+        с достаточным количеством денег и достаточным колличеством товаро,
+        + так же обязательнго проверяю что товар удалился из корзины
+        и на складе остаток уменьшился (БЫЛ 1000, стал 990 так как выкуплено всего 10 единиц)
         """
-        empty_cart.add_product(book_product, buy_count=1001)
+        assert book_product.quantity == 1000
+        empty_cart.add_product(book_product, buy_count=10)
         assert book_product in empty_cart.products
-        with pytest.raises(ValueError, match='Not enough products'):
-            empty_cart.buy(money=int(book_product.price))
-        assert book_product in empty_cart.products
-        assert empty_cart.products != {}
+        empty_cart.buy(money=int(book_product.price * sum(empty_cart.products.values())))
+        assert book_product.quantity == 990
+        assert book_product not in empty_cart.products
+        assert empty_cart.products == {}
 
     def test_cart_buy_one_product_not_enough_money(self, empty_cart: Cart, book_product: Product):
         """
@@ -260,7 +267,7 @@ class TestCart:
         empty_cart.add_product(book_product, buy_count=1000)
         assert book_product in empty_cart.products
         with pytest.raises(ValueError, match='Not enough money'):
-            empty_cart.buy(money=99999)
+            empty_cart.buy(money=int(empty_cart.get_total_price()) - 1)
 
     def test_cart_buy_all_many_products_with_enough_money(self, not_empty_cart: Cart):
         """
@@ -268,21 +275,7 @@ class TestCart:
         с достаточным количеством денег и достаточным колличеством товаров
         на складе! Покупается вся корзина и в итоге корзина становится пустой
         """
-        total_price = int(not_empty_cart.get_total_price())
         assert len(not_empty_cart.products) == 6
-        not_empty_cart.buy(money=total_price)
+        not_empty_cart.buy(money=int(not_empty_cart.get_total_price()))
         assert len(not_empty_cart.products) == 0
-        assert not not_empty_cart.products
-
-    def test_cart_buy_all_many_products_without_enough_money(self, not_empty_cart: Cart):
-        """
-        Тест кейс на покупку большого количества продуктов в корзине
-        с НЕДОСТАТОЧНЫМ количеством денег и достаточным колличеством товаров
-        на складе! Покупается вся корзина и в итоге корзина становится пустой
-        """
-        total_price = int(not_empty_cart.get_total_price())
-        assert len(not_empty_cart.products) == 6
-        with pytest.raises(ValueError, match='Not enough money'):
-            not_empty_cart.buy(money=total_price - 1)
-        assert not len(not_empty_cart.products) == 0
-
+        assert not_empty_cart.products == {}

@@ -71,11 +71,10 @@ class Cart:
             if product.check_quantity(buy_count) is True:
                 if product in self.products.keys():
                     self.products[product] += buy_count
-                    # TODO! product.quantity -= buy_count. Проработать еще и
-                    #  удаление/резервирование продуктов
+                    # product.buy(quantity=buy_count)
                 else:
                     self.products[product] = buy_count
-                    # TODO! product.quantity -= buy_count
+                    # product.buy(quantity=buy_count)
             else:
                 raise ValueError('Not enough products')
         else:
